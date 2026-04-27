@@ -245,15 +245,23 @@ export default function KanbanBoard({
     }
   }
 
-  async function handleAddCard(columnId: string, title: string) {
+  async function handleAddCard(columnId: string, cardData: any) {
     const column = columnsRef.current.find((c) => c.id === columnId);
     if (!column) return;
 
     const newPosition = column.cards ? column.cards.length + 1 : 1;
 
+    // Tarih boşsa veritabanına null olarak gönderiyoruz
+    const finalData = {
+      ...cardData,
+      column_id: columnId,
+      position: newPosition,
+      due_date: cardData.due_date === "" ? null : cardData.due_date,
+    };
+
     const { data: newCard, error } = await supabase
       .from("cards")
-      .insert({ title, column_id: columnId, position: newPosition })
+      .insert(finalData)
       .select()
       .single();
 
@@ -284,21 +292,24 @@ export default function KanbanBoard({
     if (error) console.error("Kart silinirken hata:", error.message);
   }
 
-  async function handleEditCard(cardId: string, newTitle: string) {
+  async function handleEditCard(cardId: string, updates: any) {
+    // 1. Ekrandaki (State) görünümü anında güncelle
     updateColumns((prev) =>
       prev.map((col) => ({
         ...col,
         cards:
           col.cards?.map((card: any) =>
-            card.id === cardId ? { ...card, title: newTitle } : card
+            card.id === cardId ? { ...card, ...updates } : card
           ) || [],
       }))
     );
 
+    // 2. Supabase (Veritabanı) kaydını güncelle
     const { error } = await supabase
       .from("cards")
-      .update({ title: newTitle })
+      .update(updates)
       .eq("id", cardId);
+      
     if (error) console.error("Kart güncellenirken hata:", error.message);
   }
 
