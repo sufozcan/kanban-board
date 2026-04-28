@@ -1,6 +1,6 @@
 # 📋 TaskFlow | Kurumsal Düzey Kanban Yönetim Sistemi
 
-**TaskFlow**, modern yazılım ekiplerinin çevik (Agile) süreçlerini yönetmek için tasarlanmış, veri tutarlılığı ve yüksek performans odaklı bir görev yönetim aracıdır. Bu döküman, projenin geliştirilme sürecindeki teknik kararları ve mimari çözümleri detaylandırmaktadır.
+**TaskFlow**, modern yazılım ekiplerinin çevik (Agile) süreçlerini yönetmek için tasarlanmış, veri tutarlılığı ve yüksek performans odaklı bir görev yönetim aracıdır. Kullanıcılar hesap oluşturup giriş yapabilir; board üzerinde sütun ve kartlar ekleyebilir, sürükle-bırak ile görevlerin durumunu güncelleyebilir. Tüm değişiklikler sayfa yenilemesinde korunur.
 
 > **📍 Canlı Uygulama:** [kanban-board-tau-brown.vercel.app](https://kanban-board-tau-brown.vercel.app)
 
@@ -8,26 +8,24 @@
 
 ## 📸 Uygulama Görünümü
 
-| Giriş ve Kayıt Ekranı | Ana Dashboard | Kart Taşıma |
-| :--- | :--- | :--- |
-| ![Giriş Ekranı](<img width="512" height="713" alt="Ekran görüntüsü 2026-04-28 190308" src="https://github.com/user-attachments/assets/0d802ba4-d0c1-4b54-aca8-af0b763cf732" />
-) | ![Ana Dashboard](<img width="1908" height="689" alt="Ekran görüntüsü 2026-04-28 191046" src="https://github.com/user-attachments/assets/de4ce905-6eb9-4056-9961-4558fe3f4462" />
-) | ![Kart Taşıma](<img width="1918" height="618" alt="image" src="https://github.com/user-attachments/assets/62036c2f-1dee-4b70-9a24-bd42dfaf1146" />
-) |
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0d802ba4-d0c1-4b54-aca8-af0b763cf732" height="250" />
+  <img src="https://github.com/user-attachments/assets/de4ce905-6eb9-4056-9961-4558fe3f4462" height="250" />
+  <img src="https://github.com/user-attachments/assets/62036c2f-1dee-4b70-9a24-bd42dfaf1146" height="250" />
+</p>
 
 ---
 
-## 🧠 Teknik Kararlar ve Sorulara Yanıtlar
+##  Teknik Kararlar ve Sorulara Yanıtlar
 
-Değerlendirme kriterlerinde belirtilen kritik sorulara yönelik teknik analizim aşağıdadır:
+Değerlendirme kriterlerinde belirtilen sorulara yönelik cevaplarım aşağıdadır:
 
 ### 1. Sürükle-Bırak Kütüphanesi Seçimi (Neden dnd-kit?)
 Piyasada bulunan alternatifler arasından **dnd-kit** tercih edilmiştir. 
 - **Neden dnd-kit?** `react-beautiful-dnd` artık güncellenmemekte ve hantal kalmaktadır. `SortableJS` ise React state yönetimiyle her zaman pürüzsüz çalışmayabilir. 
-- **Karar:** `dnd-kit` modüler yapısı, sıfır bağımlılığı ve en önemlisi **Sensör (Sensor)** desteği sayesinde mobil cihazlarda "uzun basma" (long press) özelliğini en temiz şekilde kurgulamama olanak sağladı.
+- **Karar:** `dnd-kit` modüler yapısı, sıfır bağımlılığı ve en önemlisi **Sensör (Sensor)** desteği sayesinde mobil cihazlarda uzun basma özelliğini en temiz şekilde kurgulamama olanak sağladı.
 
-### 2. Sıralama Verisi ve Kalıcılık (Persistence)
+### 2. Sıralama Verisi ve Kalıcılık 
 Sayfa yenilendiğinde kartların sırasının korunması için **"Index-Based Positioning"** stratejisi uygulanmıştır.
 - **Çözüm:** PostgreSQL veritabanındaki her kartın ve sütunun bir `position` (integer) değeri vardır. 
 - **Mantık:** Sürükleme işlemi bittiğinde (`onDragEnd`), sadece yer değiştiren elementlerin `position` değerleri Supabase üzerinde güncellenir. Bu sayede Board → Sütun → Kart hiyerarşisi asla bozulmaz.
@@ -52,10 +50,10 @@ Evet, uygulamada sadece kartlar değil, **sütunların kendisi de** sürükleneb
 
 ### 🔐 Güvenlik ve Auth (Authentication)
 * **Supabase Auth:** Email/Şifre tabanlı güvenli oturum yönetimi.
-* **Row Level Security (RLS):** Veritabanı seviyesinde katı güvenlik kuralları. Sisteme giriş yapmamış anonim kullanıcılar panoyu göremez veya değiştiremez.
+* **Row Level Security (RLS):** Veritabanı seviyesinde katı güvenlik kuralları entegre edilmiştir. Sisteme giriş yapmamış anonim kullanıcılar panoyu göremez veya değiştiremez.
 
 ### 🎨 Kullanıcı Arayüzü (UI/UX)
-* **Optimistic Updates:** Kart taşındığında veritabanı cevabı beklenmeden arayüz anında güncellenir, gecikme hissi ortadan kaldırılır.
+* **Anında Güncelleme:** Kart taşındığında veritabanı cevabı beklenmeden arayüz anında güncellenir, gecikme hissi ortadan kaldırılır.
 * **Trello Tarzı Scroll:** Çok sayıda sütun olduğunda sayfa düzenini bozmayan, özel tasarlanmış yatay kaydırma çubuğu.
 
 ---
@@ -97,7 +95,7 @@ create policy "Authenticated users can manage cards" on public.cards for all to 
 
 ---
 
-## 💻 Teknoloji Yığını
+## 💻 Tech Stack
 
 - **Frontend:** Next.js 14 (App Router), TypeScript
 - **Styling:** Tailwind CSS
@@ -106,9 +104,6 @@ create policy "Authenticated users can manage cards" on public.cards for all to 
 - **Deployment:** Vercel
 
 ---
-
-## 👨‍💻 Geliştirici
-**Yusuf Özcan** *İstatistik (METU) & Yönetim Bilişim Sistemleri (Anadolu Üniv.) Öğrencisi* Modern web teknolojileri ve veri analitiği odaklı çözümler geliştirmeye tutkulu.
 
 ---
 
