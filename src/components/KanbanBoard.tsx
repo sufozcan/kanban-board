@@ -35,6 +35,11 @@ export default function KanbanBoard({
 
   const columnsRef = useRef(columns);
 
+  // board_id'yi baştan al ve sakla — sütunlar silinse bile kaybolmaz
+  const boardIdRef = useRef<string | null>(
+    initialColumns.length > 0 ? initialColumns[0].board_id : null
+  );
+
   const updateColumns = useCallback(
     (updater: any[] | ((prev: any[]) => any[])) => {
       setColumns((prev) => {
@@ -62,7 +67,7 @@ export default function KanbanBoard({
 
   const dragSourceColIdRef = useRef<string | null>(null);
   const dragTypeRef = useRef<"card" | "column" | null>(null);
-  const lastDragOverTime = useRef(0); // throttle için
+  const lastDragOverTime = useRef(0);
 
   const [isMounted, setIsMounted] = useState(false);
   const [isAddingColumn, setIsAddingColumn] = useState(false);
@@ -102,7 +107,6 @@ export default function KanbanBoard({
   }
 
   function handleDragOver(event: DragOverEvent) {
-    // 16ms throttle — 60fps, daha sık çağrıları yoksay
     const now = Date.now();
     if (now - lastDragOverTime.current < 16) return;
     lastDragOverTime.current = now;
@@ -115,7 +119,6 @@ export default function KanbanBoard({
 
     if (activeId === overId) return;
 
-    // SÜTUN sürükleniyorsa
     if (dragTypeRef.current === "column") {
       updateColumns((prev) => {
         const activeIndex = prev.findIndex((c) => c.id === activeId);
@@ -127,7 +130,6 @@ export default function KanbanBoard({
       return;
     }
 
-    // KART sürükleniyor
     updateColumns((prev) => {
       const allColIds = new Set(prev.map((c) => c.id));
 
@@ -156,7 +158,6 @@ export default function KanbanBoard({
 
       const overIndex = targetCards.findIndex((c: any) => c.id === overId);
 
-      // Kart zaten doğru pozisyondaysa güncelleme yapma
       if (!overIsColumn && overIndex !== -1 && targetCards[overIndex]?.id === activeId)
         return prev;
 
@@ -176,7 +177,7 @@ export default function KanbanBoard({
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     setActiveItem(null);
-    lastDragOverTime.current = 0; // throttle'ı sıfırla
+    lastDragOverTime.current = 0;
 
     const dragType = dragTypeRef.current;
     dragTypeRef.current = null;
@@ -186,7 +187,6 @@ export default function KanbanBoard({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // SÜTUN sıralama
     if (dragType === "column") {
       const currentCols = columnsRef.current;
 
@@ -203,7 +203,6 @@ export default function KanbanBoard({
       return;
     }
 
-    // KART sıralama / taşıma
     const sourceColId = dragSourceColIdRef.current;
     dragSourceColIdRef.current = null;
 
@@ -216,7 +215,6 @@ export default function KanbanBoard({
 
     if (!currentCol) return;
 
-    // AYNI SÜTUN İÇİNDE
     if (sourceColId === currentCol.id) {
       const cards = currentCol.cards;
       const activeIndex = cards.findIndex((c: any) => c.id === activeId);
@@ -238,9 +236,7 @@ export default function KanbanBoard({
           )
         );
       }
-    }
-    // FARKLI SÜTUNA TAŞIMA
-    else {
+    } else {
       const updates: Promise<any>[] = [];
 
       for (const colId of [sourceColId, currentCol.id]) {
@@ -347,8 +343,7 @@ export default function KanbanBoard({
     if (newColumnTitle.trim() === "") return;
 
     const newPosition = columnsRef.current.length + 1;
-    const currentBoardId =
-      columnsRef.current.length > 0 ? columnsRef.current[0].board_id : null;
+    const currentBoardId = boardIdRef.current; // ← sütunlar silinse bile board_id kaybolmaz
 
     const { data: newColumn, error } = await supabase
       .from("columns")
