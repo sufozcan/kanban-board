@@ -8,11 +8,12 @@
 
 ## 📸 Uygulama Görünümü
 
-| Giriş ve Kayıt Ekranı | Ana Dashboard | Mobil Görünüm |
+| Giriş ve Kayıt Ekranı | Ana Dashboard | Kart Taşıma |
 | :--- | :--- | :--- |
 | ![Giriş Ekranı](<img width="512" height="713" alt="Ekran görüntüsü 2026-04-28 190308" src="https://github.com/user-attachments/assets/0d802ba4-d0c1-4b54-aca8-af0b763cf732" />
 ) | ![Ana Dashboard](<img width="1908" height="689" alt="Ekran görüntüsü 2026-04-28 191046" src="https://github.com/user-attachments/assets/de4ce905-6eb9-4056-9961-4558fe3f4462" />
-) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
+) | ![Kart Taşıma](<img width="1918" height="618" alt="image" src="https://github.com/user-attachments/assets/62036c2f-1dee-4b70-9a24-bd42dfaf1146" />
+) |
 
 
 ---
