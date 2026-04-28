@@ -10,7 +10,9 @@
 
 | Giriş ve Kayıt Ekranı | Ana Dashboard | Mobil Görünüm |
 | :--- | :--- | :--- |
-| ![Giriş Ekranı](<img width="512" height="713" alt="image" src="https://github.com/user-attachments/assets/6f94651a-5948-4049-bba0-401578bbda61" />) | ![Ana Dashboard](<img width="1908" height="689" alt="image" src="https://github.com/user-attachments/assets/c6dd4952-27e7-4ed7-b9cd-17cfe01ceb79" />) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
+| ![Giriş Ekranı](<img width="512" height="713" alt="Ekran görüntüsü 2026-04-28 190308" src="https://github.com/user-attachments/assets/0d802ba4-d0c1-4b54-aca8-af0b763cf732" />
+) | ![Ana Dashboard](<img width="1908" height="689" alt="Ekran görüntüsü 2026-04-28 191046" src="https://github.com/user-attachments/assets/de4ce905-6eb9-4056-9961-4558fe3f4462" />
+) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
 
 
 ---
