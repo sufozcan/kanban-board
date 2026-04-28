@@ -116,7 +116,7 @@ export default function TaskCard({
       style={style}
       {...attributes}
       {...listeners}
-      className="group relative bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-gray-300 cursor-grab active:cursor-grabbing flex flex-col gap-2"
+      className="group relative bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:border-gray-300 cursor-grab active:cursor-grabbing flex flex-col gap-2 touch-none select-none"
     >
       {/* 1. Kısım: Etiket (Varsa) */}
       {card.label && (

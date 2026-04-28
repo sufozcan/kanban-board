@@ -74,7 +74,7 @@ export default function BoardColumn({
         {...attributes}
         {...listeners}
         // Fare sütunun üzerine geldiğinde çöp kutusunu göstermek için 'group' class'ını ekledik
-        className="font-semibold text-gray-700 mb-4 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing select-none group"
+        className="font-semibold text-gray-700 mb-4 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing select-none group touch-none"
       >
         <span className="flex items-center gap-2">
           <span className="text-gray-400 text-sm">⠿</span>
