@@ -62,6 +62,7 @@ export default function KanbanBoard({
 
   const dragSourceColIdRef = useRef<string | null>(null);
   const dragTypeRef = useRef<"card" | "column" | null>(null);
+  const lastDragOverTime = useRef(0); // throttle için
 
   const [isMounted, setIsMounted] = useState(false);
   const [isAddingColumn, setIsAddingColumn] = useState(false);
@@ -101,6 +102,11 @@ export default function KanbanBoard({
   }
 
   function handleDragOver(event: DragOverEvent) {
+    // 16ms throttle — 60fps, daha sık çağrıları yoksay
+    const now = Date.now();
+    if (now - lastDragOverTime.current < 16) return;
+    lastDragOverTime.current = now;
+
     const { active, over } = event;
     if (!over) return;
 
@@ -145,13 +151,12 @@ export default function KanbanBoard({
       const activeIndex = sourceCards.findIndex((c: any) => c.id === activeId);
       if (activeIndex === -1) return prev;
 
-      // Kart zaten hedef sütundaysa tekrar işleme
       if (overIsColumn && targetCards.some((c: any) => c.id === activeId))
         return prev;
 
       const overIndex = targetCards.findIndex((c: any) => c.id === overId);
 
-      // ← GUARD: Kart zaten doğru pozisyondaysa güncelleme yapma
+      // Kart zaten doğru pozisyondaysa güncelleme yapma
       if (!overIsColumn && overIndex !== -1 && targetCards[overIndex]?.id === activeId)
         return prev;
 
@@ -171,6 +176,7 @@ export default function KanbanBoard({
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     setActiveItem(null);
+    lastDragOverTime.current = 0; // throttle'ı sıfırla
 
     const dragType = dragTypeRef.current;
     dragTypeRef.current = null;
