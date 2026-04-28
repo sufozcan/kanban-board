@@ -10,7 +10,8 @@
 
 | Giriş ve Kayıt Ekranı | Ana Dashboard | Mobil Görünüm |
 | :--- | :--- | :--- |
-| ![Giriş Ekranı](https://via.placeholder.com/400x250?text=Giris+Ekrani+Gorselini+Buraya+Surukle) | ![Ana Dashboard](https://via.placeholder.com/400x250?text=Dashboard+Gorselini+Buraya+Surukle) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
+| ![Giriş Ekranı](<img width="512" height="713" alt="image" src="https://github.com/user-attachments/assets/6f94651a-5948-4049-bba0-401578bbda61" />
+) | ![Ana Dashboard](https://via.placeholder.com/400x250?text=Dashboard+Gorselini+Buraya+Surukle) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
 
 *(Not: GitHub'da README dosyasını düzenlerken, kendi aldığın ekran görüntülerini doğrudan sürükleyip bu tablo hücrelerinin içine bırakabilirsin.)*
 
