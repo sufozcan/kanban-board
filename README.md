@@ -16,99 +16,90 @@
 
 ---
 
-##  Teknik Kararlar ve Sorulara Yanıtlar
+## 48 Saatte Neye Odaklanıldı? 
 
-Değerlendirme kriterlerinde belirtilen sorulara yönelik cevaplarım aşağıdadır:
+**" Kararlı bir şekilde çalışmayan 10 özellik yerine, kusursuz çalışan temel bir çekirdek yapıya odaklanıldı."**
 
-### 1. Sürükle-Bırak Kütüphanesi Seçimi (Neden dnd-kit?)
-Piyasada bulunan alternatifler arasından **dnd-kit** tercih edilmiştir. 
-- **Neden dnd-kit?** `react-beautiful-dnd` artık güncellenmemekte ve hantal kalmaktadır. `SortableJS` ise React state yönetimiyle her zaman pürüzsüz çalışmayabilir. 
-- **Karar:** `dnd-kit` modüler yapısı, sıfır bağımlılığı ve en önemlisi **Sensör (Sensor)** desteği sayesinde mobil cihazlarda uzun basma özelliğini en temiz şekilde kurgulamama olanak sağladı.
-
-### 2. Sıralama Verisi ve Kalıcılık 
-Sayfa yenilendiğinde kartların sırasının korunması için **"Index-Based Positioning"** stratejisi uygulanmıştır.
-- **Çözüm:** PostgreSQL veritabanındaki her kartın ve sütunun bir `position` (integer) değeri vardır. 
-- **Mantık:** Sürükleme işlemi bittiğinde (`onDragEnd`), sadece yer değiştiren elementlerin `position` değerleri Supabase üzerinde güncellenir. Bu sayede Board → Sütun → Kart hiyerarşisi asla bozulmaz.
-
-### 3. Mobil Cihaz Dinamikleri
-Mobildeki en büyük sorun "ekranı kaydırma" ile "kartı tutma" hareketinin çakışmasıdır.
-- **Mekanizma:** `TouchSensor` aktive edilerek **250ms delay** tanımlanmıştır. 
-- **Sonuç:** Kullanıcı sayfayı aşağı/sağa kaydırmak istediğinde tarayıcının normal kaydırması çalışır. Ancak bir karta 250ms basılı tuttuğunda sürükleme modu devreye girer. Ayrıca `touch-none` sınıfıyla bu çakışmalar tamamen engellenmiştir.
-
-### 4. Sütunların Sırasını Değiştirme
-Evet, uygulamada sadece kartlar değil, **sütunların kendisi de** sürüklenebilir haldedir. Bu, proje yöneticilerinin iş akışını (Örn: "Test" sütununu "Hazır"dan önceye çekmek gibi) esnekçe özelleştirmesine olanak tanır.
-
-### 5. Ekstra Özellikler: Etiket, Tarih ve Sorumlu Kişi
-48 saatlik süreçte "çalışan bir MVP" sunmak adına veri modeline şu detaylar eklenmiştir:
-- **Etiket (Label):** Görev önceliğini belirtmek için.
-- **Sorumlu Kişi (Assignee):** Görevin kime ait olduğunu netleştirmek için.
-- **Son Teslim Tarihi (Due Date):** Zaman yönetimini sağlamak için.
+48 saatlik kısıtlı sürede projenin odak noktası **temel sürükle-bırak mekaniğinin kusursuzlaştırılması, veri bütünlüğünün sağlanması ve mobil uyumluluk** olmuştur. 
+- Kartların ve sütunların sayfa yenilendiğinde sırasını koruması ve mobildeki dokunmatik çakışmalarının çözülmesi ana mesaiyi almıştır.
+- Kartlara "Etiket, Tarih ve Sorumlu Kişi" gibi detaylar, CRUD (Create, Read, Update, Delete) operasyonlarının tam çalıştığını kanıtlamak adına temel düzeyde eklenmiş, ancak bu detayların üzerinde aşırı mühendislik yapmaktan kaçınılmıştır.
 
 ---
 
-## 🛠️ Detaylı Özellik Analizi
+##  Teknik Kararlar ve Analiz
 
-### 🔐 Güvenlik ve Auth (Authentication)
-* **Supabase Auth:** Email/Şifre tabanlı güvenli oturum yönetimi.
-* **Row Level Security (RLS):** Veritabanı seviyesinde katı güvenlik kuralları entegre edilmiştir. Sisteme giriş yapmamış anonim kullanıcılar panoyu göremez veya değiştiremez.
 
-### 🎨 Kullanıcı Arayüzü (UI/UX)
-* **Anında Güncelleme:** Kart taşındığında veritabanı cevabı beklenmeden arayüz anında güncellenir, gecikme hissi ortadan kaldırılır.
-* **Trello Tarzı Scroll:** Çok sayıda sütun olduğunda sayfa düzenini bozmayan, özel tasarlanmış yatay kaydırma çubuğu.
+### 1. Kütüphane Karşılaştırması: Neden `dnd-kit`?
+Piyasadaki alternatifler değerlendirildiğinde şu artılar ve eksiler masaya yatırılmıştır:
+* **Tarayıcı Yerleşik (Native HTML5) Drag-and-Drop:** Ek bağımlılık gerektirmez ancak mobil desteği yeterli değildir. Ciddi "polyfill" yazmayı gerektirir ve UI kısıtlamaları çok fazladır.
+* **`SortableJS`:** Çok hızlıdır ancak DOM'u doğrudan manipüle ettiği için React'in Virtual DOM yapısıyla (özellikle state güncellemelerinde) ciddi çakışmalar ve senkronizasyon hataları yaratır.
+* **`@hello-pangea/dnd`:** API'si harikadır ancak dosya boyutu nispeten büyüktür ve React 18 Strict Mode ile zaman zaman uyum sorunları yaşatır.
+* ** Seçim (`dnd-kit`):** Headless (görünümsüz) mimarisi sayesinde tam UI kontrolü sağlar. **Sensör (Sensor) API'si** sayesinde mobil/masaüstü ayrımını en hassas yönetebildiğimiz, modern ve hafif kütüphanedir.
+
+### 2. Sıralama Verisi ve Kalıcılık (Persistence)
+Sayfa yenilendiğinde kart sırasının korunması için "Index-Based Positioning" (Pozisyon Bazlı Sıralama) kullanılmıştır. Supabase veritabanında her kartın bir `position` değeri tutulur. Sürükleme bittiğinde (`onDragEnd`), değişen dizilim tespit edilir ve veritabanı anlık olarak güncellenir.
+
+### 3. Mobil Cihaz Dinamikleri (Mobile UX)
+Mobilde "ekranı kaydırma" ile "kartı tutma" hareketinin çakışması, `TouchSensor` ile çözülmüştür. Karta **250ms basılı tutulduğunda (Long Press)** sürükleme modu devreye girer. Ayrıca `touch-none` sınıfıyla tarayıcının istenmeyen müdahaleleri engellenmiştir.
+
+### 4. Sütunların Sırasının Değiştirilmesi
+Kapsama dahil edilmiştir. İş akışlarının (Örn: "Test" sütununu "Hazır"dan önceye çekmek) özelleştirilebilmesi için sütunlar da sürüklenebilir (Draggable) yapılmıştır.
+
+### 5. Performans: Çok Sayıda Kart Olduğunda Akıcılık
+`dnd-kit`, sürükleme işlemi sırasında elementleri DOM içinde fiziksel olarak yer değiştirmek yerine, GPU hızlandırmalı **CSS `transform` (translate3d)** özelliğini kullanır. Bu sayede "Layout Thrashing" (tarayıcının sayfayı sürekli yeniden çizmesi) engellenir. Yüzlerce kart olduğunda bile 60fps (akıcı) bir sürükleme deneyimi korunur.
 
 ---
 
-## 💾 Veritabanı Mimarisi (SQL)
+## 🚫 Kapsam Dışı Bırakılanlar
 
-Proje için kurgulanan ve Supabase üzerinde çalışan tablo mimarisi aşağıdaki gibidir:
+48 saatlik süreyi verimli kullanmak adına bazı özellikler bilinçli olarak kapsam dışı bırakılmıştır:
 
-```sql
--- 1. SÜTUNLAR TABLOSU
-create table public.columns (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  position int not null default 0,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+* **Gelişmiş Board Paylaşımı (Sadece İzleme vs. Düzenleme):** Uygulama şu an yetki ayrımı olmadan "Birlikte Düzenleme" mantığıyla çalışmaktadır. Farklı yetki seviyeleri (Admin, Viewer) eklemek karmaşık bir "Role-Based Access Control (RBAC)" mimarisi gerektireceğinden kapsam dışında tutulmuştur.
+* **Aktivite Geçmişi (Log / History):** Bir kartın hangi sütunlar arasında ne zaman taşındığını görmek kurumsal firmalar için çok değerlidir. Ancak bunun için veritabanında ayrı bir log tablosu kurgulamak ve "Event Sourcing" mantığı kurmak gerektiğinden, odak temel mekaniklere kaydırılmış ve bu özellik şimdilik ertelenmiştir.
 
--- 2. KARTLAR (GÖREVLER) TABLOSU
-create table public.cards (
-  id uuid default gen_random_uuid() primary key,
-  column_id uuid references public.columns(id) on delete cascade not null,
-  title text not null,
-  description text,
-  label text,
-  assignee text,
-  due_date date,
-  position int not null default 0,
-  user_id uuid references auth.users(id) default auth.uid(),
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
+---
 
--- 3. GÜVENLİK (RLS) POLİTİKALARI
-alter table public.columns enable row level security;
-alter table public.cards enable row level security;
+## 🏗️ Proje Mimarisi ve Dosya Yapısı (`src/`)
 
-create policy "Authenticated users can manage columns" on public.columns for all to authenticated using (true);
-create policy "Authenticated users can manage cards" on public.cards for all to authenticated using (true);
+Proje, Next.js App Router yapısına ve "Separation of Concerns" (Sorumlulukların Ayrılması) prensibine uygun olarak modüler şekilde tasarlanmıştır.
+
+```text
+taskflow/
+├── src/
+│   ├── app/
+│   │   ├── globals.css      # Custom scrollbar ve global stiller
+│   │   ├── layout.tsx       # Ana HTML/Body yapısı
+│   │   └── page.tsx         # Ana Dashboard (Veri çekme ve state yönetimi)
+│   ├── components/
+│   │   ├── Auth.tsx         # Giriş/Kayıt olma ekranı (Supabase)
+│   │   ├── BoardColumn.tsx  # Sütun bileşeni (Droppable area)
+│   │   ├── KanbanBoard.tsx  # Dnd-context ve sensör kurallarının merkezi
+│   │   └── TaskCard.tsx     # Tekil kart bileşeni (Draggable item)
+│   └── lib/
+│       └── supabase.ts      # Supabase istemci bağlantısı
+├── .env.local               # Gizli API anahtarları
+└── tailwind.config.ts       # UI tasarım kuralları
 ```
 
 ---
 
-## 💻 Tech Stack
+## 🔐 Güvenlik (Row Level Security)
+Veritabanı işlemleri Supabase üzerinden RLS politikaları ile korunmaktadır. Anonim (giriş yapmamış) kullanıcılar panoyu göremez veya veri değiştiremez.
 
-- **Frontend:** Next.js 14 (App Router), TypeScript
-- **Styling:** Tailwind CSS
-- **Drag & Drop:** `@dnd-kit/core`, `@dnd-kit/sortable`
-- **Backend & Auth:** Supabase (PostgreSQL)
+---
+
+## 💻 Teknoloji Yığını
+- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
+- **Sürükle-Bırak:** `@dnd-kit/core`, `@dnd-kit/sortable`
+- **Backend/DB:** Supabase (PostgreSQL)
 - **Deployment:** Vercel
 
 ---
 
----
+### Kurulum
+1. `git clone https://github.com/kullaniciadi/taskflow.git`
+2. `npm install`
+3. `.env.local` oluşturup Supabase bilgilerinizi ekleyin.
+4. `npm run dev` ile başlatın.
 
-### Nasıl Kurulur?
-1. `git clone https://github.com/kullaniciadi/taskflow.git` ile projeyi indirin.
-2. `npm install` ile bağımlılıkları yükleyin.
-3. `.env.local` dosyasına Supabase URL ve Anon Key bilgilerinizi ekleyin.
-4. `npm run dev` ile projeyi yerelde başlatın.
+
