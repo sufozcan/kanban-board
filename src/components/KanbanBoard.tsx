@@ -37,7 +37,7 @@ export default function KanbanBoard({
 
   // board_id'yi baştan al ve sakla — sütunlar silinse bile kaybolmaz
   const boardIdRef = useRef<string | null>(
-    initialColumns.length > 0 ? initialColumns[0].board_id : null
+    initialColumns.length > 0 ? initialColumns[0].board_id : "3971a160-bf25-4641-8092-0d0d050fa167"
   );
 
   const updateColumns = useCallback(
