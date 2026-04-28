@@ -1,66 +1,117 @@
-📋 TaskFlow — Profesyonel Kanban Yönetim Sistemi
-TaskFlow, modern yazılım ekiplerinin ihtiyaç duyduğu hız, güvenlik ve mobil uyumluluk kriterlerini karşılamak üzere geliştirilmiş tam kapsamlı bir proje yönetim aracıdır. Bu proje, mükemmel temel mekanikler ve sağlam veri mimarisi hedeflenerek inşa edilmiştir.
+# 📋 TaskFlow | Kurumsal Düzey Kanban Yönetim Sistemi
 
-🚀 Canlı Uygulama
-🔗 kanban-board-tau-brown.vercel.app
+**TaskFlow**, modern yazılım ekiplerinin çevik (Agile) süreçlerini yönetmek için tasarlanmış, veri tutarlılığı ve yüksek performans odaklı bir görev yönetim aracıdır. Bu döküman, projenin geliştirilme sürecindeki teknik kararları ve mimari çözümleri detaylandırmaktadır.
 
-🛠️ Teknik Kararlar ve Stratejiler
-Değerlendirme kriterlerinde yer alan kritik sorulara yönelik geliştirdiğim çözümler aşağıdadır:
+> **📍 Canlı Uygulama:** [kanban-board-tau-brown.vercel.app](https://kanban-board-tau-brown.vercel.app)
 
-1. Kütüphane Seçimi: Neden dnd-kit?
-Projede artık bakım desteği verilmeyen react-beautiful-dnd yerine, modern ve modüler bir yapı sunan dnd-kit tercih edilmiştir.
+---
 
-Avantajı: Ağaç sallama (tree-shaking) desteğiyle hafif olması, sıfır bağımlılık ilkesi ve sensör tabanlı yapısı sayesinde mobil/masaüstü ayrımını en iyi şekilde yönetmesidir.
+## 📸 Uygulama Görünümü
 
-2. Sıralama ve Veri Tutarlılığı
-Sayfa yenilendiğinde kartların sırasının bozulmaması için Supabase (PostgreSQL) üzerinde her kart ve sütun için bir position (float/integer) sütunu kullanılmıştır.
+| Giriş ve Kayıt Ekranı | Ana Dashboard | Mobil Görünüm |
+| :--- | :--- | :--- |
+| ![Giriş Ekranı](https://via.placeholder.com/400x250?text=Giris+Ekrani+Gorselini+Buraya+Surukle) | ![Ana Dashboard](https://via.placeholder.com/400x250?text=Dashboard+Gorselini+Buraya+Surukle) | ![Mobil Görünüm](https://via.placeholder.com/400x250?text=Mobil+Gorunum+Gorselini+Buraya+Surukle) |
 
-Mantık: Sürükleme bittiği anda dnd-kit'ten gelen yeni dizilim position değerleri üzerinden güncellenir. Bu sayede veri modeli (Board → Sütun → Kart) hiyerarşisi bozulmadan korunur.
+*(Not: GitHub'da README dosyasını düzenlerken, kendi aldığın ekran görüntülerini doğrudan sürükleyip bu tablo hücrelerinin içine bırakabilirsin.)*
 
-3. Mobil Cihazlarda Sürükle-Bırak (Mobile UX)
-Dokunmatik ekranlarda "kaydırma" (scroll) ve "sürükleme" (drag) hareketlerinin çakışması, özel bir Long Press (Uzun Basma) mekanizması ile çözülmüştür:
+---
 
-Çözüm: TouchSensor kullanılarak 250ms basılı tutma kuralı eklenmiştir.
+## 🧠 Teknik Kararlar ve Sorulara Yanıtlar
 
-Erişilebilirlik: touch-none ve select-none CSS özellikleri ile tarayıcının varsayılan hareketleri kısıtlanarak, mobilde "yağ gibi akan" bir deneyim sağlanmıştır.
+Değerlendirme kriterlerinde belirtilen kritik sorulara yönelik teknik analizim aşağıdadır:
 
-4. Güvenlik ve Paylaşım (RLS)
-Proje, kurumsal standartlarda Row Level Security (RLS) ile korunmaktadır.
+### 1. Sürükle-Bırak Kütüphanesi Seçimi (Neden dnd-kit?)
+Piyasada bulunan alternatifler arasından **dnd-kit** tercih edilmiştir. 
+- **Neden dnd-kit?** `react-beautiful-dnd` artık güncellenmemekte ve hantal kalmaktadır. `SortableJS` ise React state yönetimiyle her zaman pürüzsüz çalışmayabilir. 
+- **Karar:** `dnd-kit` modüler yapısı, sıfır bağımlılığı ve en önemlisi **Sensör (Sensor)** desteği sayesinde mobil cihazlarda "uzun basma" (long press) özelliğini en temiz şekilde kurgulamama olanak sağladı.
 
-Senaryo: Uygulama "Birlikte Düzenleme" (Shared Dashboard) modeline göre kurgulanmıştır. Sadece sisteme giriş yapmış yetkili kullanıcılar veritabanına erişebilir ve işlem yapabilir.
+### 2. Sıralama Verisi ve Kalıcılık (Persistence)
+Sayfa yenilendiğinde kartların sırasının korunması için **"Index-Based Positioning"** stratejisi uygulanmıştır.
+- **Çözüm:** PostgreSQL veritabanındaki her kartın ve sütunun bir `position` (integer) değeri vardır. 
+- **Mantık:** Sürükleme işlemi bittiğinde (`onDragEnd`), sadece yer değiştiren elementlerin `position` değerleri Supabase üzerinde güncellenir. Bu sayede Board → Sütun → Kart hiyerarşisi asla bozulmaz.
 
-✨ Uygulama Özellikleri
-Auth Sistemi: Supabase Auth ile güvenli kayıt ve giriş.
+### 3. Mobil Cihaz Dinamikleri
+Mobildeki en büyük sorun "ekranı kaydırma" ile "kartı tutma" hareketinin çakışmasıdır.
+- **Mekanizma:** `TouchSensor` aktive edilerek **250ms delay** tanımlanmıştır. 
+- **Sonuç:** Kullanıcı sayfayı aşağı/sağa kaydırmak istediğinde tarayıcının normal kaydırması çalışır. Ancak bir karta 250ms basılı tuttuğunda sürükleme modu devreye girer. Ayrıca `touch-none` sınıfıyla bu çakışmalar tamamen engellenmiştir.
 
-Tam CRUD: Sütun ve kart ekleme, başlık/detay düzenleme ve silme işlemleri.
+### 4. Sütunların Sırasını Değiştirme
+Evet, uygulamada sadece kartlar değil, **sütunların kendisi de** sürüklenebilir haldedir. Bu, proje yöneticilerinin iş akışını (Örn: "Test" sütununu "Hazır"dan önceye çekmek gibi) esnekçe özelleştirmesine olanak tanır.
 
-Gelişmiş Kart Detayları: Etiket (label), son teslim tarihi (due date) ve sorumlu kişi (assignee) desteği.
+### 5. Ekstra Özellikler: Etiket, Tarih ve Sorumlu Kişi
+48 saatlik süreçte "çalışan bir MVP" sunmak adına veri modeline şu detaylar eklenmiştir:
+- **Etiket (Label):** Görev önceliğini belirtmek için.
+- **Sorumlu Kişi (Assignee):** Görevin kime ait olduğunu netleştirmek için.
+- **Son Teslim Tarihi (Due Date):** Zaman yönetimini sağlamak için.
 
-Sütun Reordering: Sadece kartlar değil, sütunlar da kendi aralarında sürüklenebilir.
+---
 
-Görsel Geribildirim: Sürükleme sırasında gölge efektleri, renk değişimleri ve yer tutucu (placeholder) animasyonları.
+## 🛠️ Detaylı Özellik Analizi
 
-Custom Scroll: Çok sayıda sütun olduğunda Trello tarzı modern yatay kaydırma çubuğu.
+### 🔐 Güvenlik ve Auth (Authentication)
+* **Supabase Auth:** Email/Şifre tabanlı güvenli oturum yönetimi.
+* **Row Level Security (RLS):** Veritabanı seviyesinde katı güvenlik kuralları. Sisteme giriş yapmamış anonim kullanıcılar panoyu göremez veya değiştiremez.
 
-🏗️ Teknoloji Yığını
-Framework: Next.js (App Router) & TypeScript
+### 🎨 Kullanıcı Arayüzü (UI/UX)
+* **Optimistic Updates:** Kart taşındığında veritabanı cevabı beklenmeden arayüz anında güncellenir, gecikme hissi ortadan kaldırılır.
+* **Trello Tarzı Scroll:** Çok sayıda sütun olduğunda sayfa düzenini bozmayan, özel tasarlanmış yatay kaydırma çubuğu.
 
-Veritabanı: Supabase (PostgreSQL) & RLS Security
+---
 
-Sürükle-Bırak: @dnd-kit/core & @dnd-kit/sortable
+## 💾 Veritabanı Mimarisi (SQL)
 
-Styling: Tailwind CSS
+Proje için kurgulanan ve Supabase üzerinde çalışan tablo mimarisi aşağıdaki gibidir:
 
-Deployment: Vercel
+```sql
+-- 1. SÜTUNLAR TABLOSU
+create table public.columns (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  position int not null default 0,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
+-- 2. KARTLAR (GÖREVLER) TABLOSU
+create table public.cards (
+  id uuid default gen_random_uuid() primary key,
+  column_id uuid references public.columns(id) on delete cascade not null,
+  title text not null,
+  description text,
+  label text,
+  assignee text,
+  due_date date,
+  position int not null default 0,
+  user_id uuid references auth.users(id) default auth.uid(),
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
 
-🛠️ Yerel Kurulum
-Depoyu klonlayın ve dizine gidin.
+-- 3. GÜVENLİK (RLS) POLİTİKALARI
+alter table public.columns enable row level security;
+alter table public.cards enable row level security;
 
-npm install ile bağımlılıkları yükleyin.
+create policy "Authenticated users can manage columns" on public.columns for all to authenticated using (true);
+create policy "Authenticated users can manage cards" on public.cards for all to authenticated using (true);
+```
 
-.env.local dosyasına Supabase URL ve Anon Key bilgilerinizi girin.
+---
 
-npm run dev ile projeyi ayağa kaldırın.
+## 💻 Teknoloji Yığını
 
-Not: Bu proje, 48 saatlik kısıtlı sürede "yarım kalan çok özellik" yerine "kusursuz çalışan temel bir ürün" vizyonuyla, özellikle veri tutarlılığı ve mobil deneyim üzerine yoğunlaşılarak tamamlanmıştır.
+- **Frontend:** Next.js 14 (App Router), TypeScript
+- **Styling:** Tailwind CSS
+- **Drag & Drop:** `@dnd-kit/core`, `@dnd-kit/sortable`
+- **Backend & Auth:** Supabase (PostgreSQL)
+- **Deployment:** Vercel
+
+---
+
+## 👨‍💻 Geliştirici
+**Yusuf Özcan** *İstatistik (METU) & Yönetim Bilişim Sistemleri (Anadolu Üniv.) Öğrencisi* Modern web teknolojileri ve veri analitiği odaklı çözümler geliştirmeye tutkulu.
+
+---
+
+### Nasıl Kurulur?
+1. `git clone https://github.com/kullaniciadi/taskflow.git` ile projeyi indirin.
+2. `npm install` ile bağımlılıkları yükleyin.
+3. `.env.local` dosyasına Supabase URL ve Anon Key bilgilerinizi ekleyin.
+4. `npm run dev` ile projeyi yerelde başlatın.
