@@ -51,18 +51,12 @@ export default function KanbanBoard({
     data: any;
   } | null>(null);
 
-  // --- MOBİL VE MASAÜSTÜ SENSÖR AYARLARI ---
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5, // Masaüstünde fare ile 5px sürüklemeden işlem başlamaz (tıklamalarla karışmaması için)
-      },
+      activationConstraint: { distance: 5 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250, // MOBİL İÇİN: 250 milisaniye uzun basmak gerekir
-        tolerance: 5, // Uzun basarken parmak 5px kayarsa işlemi iptal etme
-      },
+      activationConstraint: { delay: 250, tolerance: 5 },
     })
   );
 
@@ -76,8 +70,6 @@ export default function KanbanBoard({
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  
 
   const collisionDetection = useCallback((args: any) => {
     if (dragTypeRef.current === "column") {
@@ -117,7 +109,7 @@ export default function KanbanBoard({
 
     if (activeId === overId) return;
 
-    // SÜTUN sürükleniyorsa — anlık önizleme için sırayı güncelle
+    // SÜTUN sürükleniyorsa
     if (dragTypeRef.current === "column") {
       updateColumns((prev) => {
         const activeIndex = prev.findIndex((c) => c.id === activeId);
@@ -153,10 +145,16 @@ export default function KanbanBoard({
       const activeIndex = sourceCards.findIndex((c: any) => c.id === activeId);
       if (activeIndex === -1) return prev;
 
+      // Kart zaten hedef sütundaysa tekrar işleme
       if (overIsColumn && targetCards.some((c: any) => c.id === activeId))
         return prev;
 
       const overIndex = targetCards.findIndex((c: any) => c.id === overId);
+
+      // ← GUARD: Kart zaten doğru pozisyondaysa güncelleme yapma
+      if (!overIsColumn && overIndex !== -1 && targetCards[overIndex]?.id === activeId)
+        return prev;
+
       const insertIndex = overIndex >= 0 ? overIndex : targetCards.length;
 
       const [movedCard] = sourceCards.splice(activeIndex, 1);
@@ -182,7 +180,7 @@ export default function KanbanBoard({
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // SÜTUN sıralama — handleDragOver zaten sırayı güncelledi, sadece Supabase'e yaz
+    // SÜTUN sıralama
     if (dragType === "column") {
       const currentCols = columnsRef.current;
 
@@ -265,7 +263,6 @@ export default function KanbanBoard({
 
     const newPosition = column.cards ? column.cards.length + 1 : 1;
 
-    // Tarih boşsa veritabanına null olarak gönderiyoruz
     const finalData = {
       ...cardData,
       column_id: columnId,
@@ -307,7 +304,6 @@ export default function KanbanBoard({
   }
 
   async function handleEditCard(cardId: string, updates: any) {
-    // 1. Ekrandaki (State) görünümü anında güncelle
     updateColumns((prev) =>
       prev.map((col) => ({
         ...col,
@@ -318,13 +314,27 @@ export default function KanbanBoard({
       }))
     );
 
-    // 2. Supabase (Veritabanı) kaydını güncelle
     const { error } = await supabase
       .from("cards")
       .update(updates)
       .eq("id", cardId);
-      
+
     if (error) console.error("Kart güncellenirken hata:", error.message);
+  }
+
+  async function handleDeleteColumn(columnId: string) {
+    if (!window.confirm("Bu sütunu ve içindeki tüm görevleri silmek istediğinize emin misiniz?")) {
+      return;
+    }
+
+    updateColumns((prev) => prev.filter((col) => col.id !== columnId));
+
+    const { error } = await supabase
+      .from("columns")
+      .delete()
+      .eq("id", columnId);
+
+    if (error) console.error("Sütun silinirken hata:", error.message);
   }
 
   async function handleAddColumn() {
@@ -357,27 +367,6 @@ export default function KanbanBoard({
   if (!isMounted) return null;
 
   const columnIds = columns.map((c) => c.id);
-
-  // Sütun Silme Fonksiyonu
-  async function handleDeleteColumn(columnId: string) {
-    // Kullanıcıya kazara silmelere karşı bir onay penceresi gösterelim
-    if (!window.confirm("Bu sütunu ve içindeki tüm görevleri silmek istediğinize emin misiniz?")) {
-      return;
-    }
-
-    // 1. Ekrandaki (State) görünümü anında güncelle
-    updateColumns((prev) => prev.filter((col) => col.id !== columnId));
-
-    // 2. Supabase (Veritabanı) kaydını sil
-    const { error } = await supabase
-      .from("columns")
-      .delete()
-      .eq("id", columnId);
-      
-    if (error) {
-      console.error("Sütun silinirken hata:", error.message);
-    }
-  }
 
   return (
     <DndContext
