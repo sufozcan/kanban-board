@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+📋 TaskFlow — Profesyonel Kanban Yönetim Sistemi
+TaskFlow, modern yazılım ekiplerinin ihtiyaç duyduğu hız, güvenlik ve mobil uyumluluk kriterlerini karşılamak üzere geliştirilmiş tam kapsamlı bir proje yönetim aracıdır. Bu proje, mükemmel temel mekanikler ve sağlam veri mimarisi hedeflenerek inşa edilmiştir.
 
-## Getting Started
+🚀 Canlı Uygulama
+🔗 kanban-board-tau-brown.vercel.app
 
-First, run the development server:
+🛠️ Teknik Kararlar ve Stratejiler
+Değerlendirme kriterlerinde yer alan kritik sorulara yönelik geliştirdiğim çözümler aşağıdadır:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Kütüphane Seçimi: Neden dnd-kit?
+Projede artık bakım desteği verilmeyen react-beautiful-dnd yerine, modern ve modüler bir yapı sunan dnd-kit tercih edilmiştir.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Avantajı: Ağaç sallama (tree-shaking) desteğiyle hafif olması, sıfır bağımlılık ilkesi ve sensör tabanlı yapısı sayesinde mobil/masaüstü ayrımını en iyi şekilde yönetmesidir.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Sıralama ve Veri Tutarlılığı
+Sayfa yenilendiğinde kartların sırasının bozulmaması için Supabase (PostgreSQL) üzerinde her kart ve sütun için bir position (float/integer) sütunu kullanılmıştır.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Mantık: Sürükleme bittiği anda dnd-kit'ten gelen yeni dizilim position değerleri üzerinden güncellenir. Bu sayede veri modeli (Board → Sütun → Kart) hiyerarşisi bozulmadan korunur.
 
-## Learn More
+3. Mobil Cihazlarda Sürükle-Bırak (Mobile UX)
+Dokunmatik ekranlarda "kaydırma" (scroll) ve "sürükleme" (drag) hareketlerinin çakışması, özel bir Long Press (Uzun Basma) mekanizması ile çözülmüştür:
 
-To learn more about Next.js, take a look at the following resources:
+Çözüm: TouchSensor kullanılarak 250ms basılı tutma kuralı eklenmiştir.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Erişilebilirlik: touch-none ve select-none CSS özellikleri ile tarayıcının varsayılan hareketleri kısıtlanarak, mobilde "yağ gibi akan" bir deneyim sağlanmıştır.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Güvenlik ve Paylaşım (RLS)
+Proje, kurumsal standartlarda Row Level Security (RLS) ile korunmaktadır.
 
-## Deploy on Vercel
+Senaryo: Uygulama "Birlikte Düzenleme" (Shared Dashboard) modeline göre kurgulanmıştır. Sadece sisteme giriş yapmış yetkili kullanıcılar veritabanına erişebilir ve işlem yapabilir.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+✨ Uygulama Özellikleri
+Auth Sistemi: Supabase Auth ile güvenli kayıt ve giriş.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Tam CRUD: Sütun ve kart ekleme, başlık/detay düzenleme ve silme işlemleri.
+
+Gelişmiş Kart Detayları: Etiket (label), son teslim tarihi (due date) ve sorumlu kişi (assignee) desteği.
+
+Sütun Reordering: Sadece kartlar değil, sütunlar da kendi aralarında sürüklenebilir.
+
+Görsel Geribildirim: Sürükleme sırasında gölge efektleri, renk değişimleri ve yer tutucu (placeholder) animasyonları.
+
+Custom Scroll: Çok sayıda sütun olduğunda Trello tarzı modern yatay kaydırma çubuğu.
+
+🏗️ Teknoloji Yığını
+Framework: Next.js (App Router) & TypeScript
+
+Veritabanı: Supabase (PostgreSQL) & RLS Security
+
+Sürükle-Bırak: @dnd-kit/core & @dnd-kit/sortable
+
+Styling: Tailwind CSS
+
+Deployment: Vercel
+
+
+🛠️ Yerel Kurulum
+Depoyu klonlayın ve dizine gidin.
+
+npm install ile bağımlılıkları yükleyin.
+
+.env.local dosyasına Supabase URL ve Anon Key bilgilerinizi girin.
+
+npm run dev ile projeyi ayağa kaldırın.
+
+Not: Bu proje, 48 saatlik kısıtlı sürede "yarım kalan çok özellik" yerine "kusursuz çalışan temel bir ürün" vizyonuyla, özellikle veri tutarlılığı ve mobil deneyim üzerine yoğunlaşılarak tamamlanmıştır.
