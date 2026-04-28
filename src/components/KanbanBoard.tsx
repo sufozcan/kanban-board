@@ -13,6 +13,7 @@ import {
   pointerWithin,
   rectIntersection,
   closestCenter,
+  TouchSensor,
 } from "@dnd-kit/core";
 import { SortableContext, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import BoardColumn from "./BoardColumn";
@@ -50,6 +51,21 @@ export default function KanbanBoard({
     data: any;
   } | null>(null);
 
+  // --- MOBİL VE MASAÜSTÜ SENSÖR AYARLARI ---
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Masaüstünde fare ile 5px sürüklemeden işlem başlamaz (tıklamalarla karışmaması için)
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // MOBİL İÇİN: 250 milisaniye uzun basmak gerekir
+        tolerance: 5, // Uzun basarken parmak 5px kayarsa işlemi iptal etme
+      },
+    })
+  );
+
   const dragSourceColIdRef = useRef<string | null>(null);
   const dragTypeRef = useRef<"card" | "column" | null>(null);
 
@@ -61,9 +77,7 @@ export default function KanbanBoard({
     setIsMounted(true);
   }, []);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
-  );
+  
 
   const collisionDetection = useCallback((args: any) => {
     if (dragTypeRef.current === "column") {
