@@ -18,7 +18,7 @@
 
 ## 48 Saatte Neye Odaklanıldı? 
 
-**" Kararlı bir şekilde çalışmayan 10 özellik yerine, kusursuz çalışan temel bir çekirdek yapıya odaklanıldı."**
+**" Kararlı bir şekilde çalışmayan fazla özellik yerine, kusursuz çalışan temel bir çekirdek yapıya odaklanıldı."**
 
 48 saatlik kısıtlı sürede projenin odak noktası **temel sürükle-bırak mekaniğinin kusursuzlaştırılması, veri bütünlüğünün sağlanması ve mobil uyumluluk** olmuştur. 
 - Kartların ve sütunların sayfa yenilendiğinde sırasını koruması ve mobildeki dokunmatik çakışmalarının çözülmesi ana mesaiyi almıştır.
