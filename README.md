@@ -1,6 +1,6 @@
-# 📋 TaskFlow | Kurumsal Düzey Kanban Yönetim Sistemi
+# 📋 TaskFlow | Kanban Proje Yönetim Tahtası
 
-**TaskFlow**, modern yazılım ekiplerinin çevik (Agile) süreçlerini yönetmek için tasarlanmış, veri tutarlılığı ve yüksek performans odaklı bir görev yönetim aracıdır. Kullanıcılar hesap oluşturup giriş yapabilir; board üzerinde sütun ve kartlar ekleyebilir, sürükle-bırak ile görevlerin durumunu güncelleyebilir. Tüm değişiklikler sayfa yenilemesinde korunur.
+**TaskFlow**, küçük yazılım ekipleri için geliştirilmiş , veri tutarlılığı ve yüksek performans odaklı bir görev yönetim aracıdır. Kullanıcılar hesap oluşturup giriş yapabilir; board üzerinde sütun ve kartlar ekleyebilir, sürükle-bırak ile görevlerin durumunu güncelleyebilir. Tüm değişiklikler sayfa yenilemesinde korunur.
 
 > **📍 Canlı Uygulama:** [kanban-board-tau-brown.vercel.app](https://kanban-board-tau-brown.vercel.app)
 
