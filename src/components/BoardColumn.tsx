@@ -11,12 +11,14 @@ export default function BoardColumn({
   onAddCard,
   onDeleteCard,
   onEditCard,
+  onDeleteColumn,
   isDragging,
 }: { 
   column: any, 
   onAddCard: (colId: string, cardData: any) => void,
   onDeleteCard: (cardId: string, colId: string) => void,
   onEditCard: (cardId: string, updates: any) => void,
+  onDeleteColumn: (colId: string) => void,
   isDragging?: boolean,
 }) {
   const [isAdding, setIsAdding] = useState(false);
@@ -71,15 +73,30 @@ export default function BoardColumn({
       <h2
         {...attributes}
         {...listeners}
-        className="font-semibold text-gray-700 mb-4 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing select-none"
+        // Fare sütunun üzerine geldiğinde çöp kutusunu göstermek için 'group' class'ını ekledik
+        className="font-semibold text-gray-700 mb-4 px-2 flex justify-between items-center cursor-grab active:cursor-grabbing select-none group"
       >
         <span className="flex items-center gap-2">
           <span className="text-gray-400 text-sm">⠿</span>
           {column.title}
         </span>
-        <span className="text-xs bg-gray-300 px-2 py-1 rounded-full cursor-default">
-          {cardIds.length}
-        </span>
+        
+        <div className="flex items-center gap-1">
+          <span className="text-xs bg-gray-300 px-2 py-1 rounded-full cursor-default">
+            {cardIds.length}
+          </span>
+          {/* Silme Butonu */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // Butona tıklanınca "sürükleme" olayının tetiklenmesini engeller
+              onDeleteColumn(column.id);
+            }}
+            className="opacity-0 group-hover:opacity-100 text-xs p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+            title="Sütunu Sil"
+          >
+            🗑️
+          </button>
+        </div>
       </h2>
       
       <div className="flex flex-col gap-3 flex-grow text-left">

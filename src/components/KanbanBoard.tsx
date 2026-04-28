@@ -344,6 +344,27 @@ export default function KanbanBoard({
 
   const columnIds = columns.map((c) => c.id);
 
+  // Sütun Silme Fonksiyonu
+  async function handleDeleteColumn(columnId: string) {
+    // Kullanıcıya kazara silmelere karşı bir onay penceresi gösterelim
+    if (!window.confirm("Bu sütunu ve içindeki tüm görevleri silmek istediğinize emin misiniz?")) {
+      return;
+    }
+
+    // 1. Ekrandaki (State) görünümü anında güncelle
+    updateColumns((prev) => prev.filter((col) => col.id !== columnId));
+
+    // 2. Supabase (Veritabanı) kaydını sil
+    const { error } = await supabase
+      .from("columns")
+      .delete()
+      .eq("id", columnId);
+      
+    if (error) {
+      console.error("Sütun silinirken hata:", error.message);
+    }
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -361,6 +382,7 @@ export default function KanbanBoard({
               onAddCard={handleAddCard}
               onDeleteCard={handleDeleteCard}
               onEditCard={handleEditCard}
+              onDeleteColumn={handleDeleteColumn}
               isDragging={activeItem?.type === "column" && activeItem.data?.id === col.id}
             />
           ))}
